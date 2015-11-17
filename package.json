@@ -12,7 +12,7 @@
     "dev": "node server",
     "clean": "rimraf dist",
     "build": "npm run clean && webpack --config webpack.prod.config.js",
-    "publish": "npm run build && cp src/index.html dist/index.html && git checkout gh-pages && cp dist/* . && git commit -am 'Code update' && git push origin gh-pages && git checkout master"
+    "publish": "npm run build && cp gh-pages.html dist/index.html && git checkout gh-pages && cp dist/* . && git commit -am 'Code update' && git push origin gh-pages && git checkout master"
   },
   "devDependencies": {
     "babel-core": "^6.1.21",
