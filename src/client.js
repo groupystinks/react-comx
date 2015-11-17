@@ -2,7 +2,6 @@ import React from 'react';
 import {Router, Route, IndexRoute} from 'react-router';
 import ReactDOM from 'react-dom';
 import App from './App';
-import HomePage from './HomePage';
 import createBrowserHistory from 'history/lib/createBrowserHistory';
 
 const Routes = (
