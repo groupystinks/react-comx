@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 
+const styles = require('./CountdownTimer.css');
 
 class CountdownTimer extends Component {
   static displayName = 'CountdownTimer';
@@ -9,6 +10,9 @@ class CountdownTimer extends Component {
     deadline: PropTypes.string.isRequired,
     options: PropTypes.object.isRequired,
     size: PropTypes.string,
+    colorFinished: PropTypes.string,
+    colorGoing: PropTypes.string,
+    textColor: PropTypes.string,
   }
 
   constructor() {
@@ -27,7 +31,7 @@ class CountdownTimer extends Component {
       minute: 60,
       hour: 24,
       day: 365,
-      year: 1,
+      year: 5,
     };
     this.state = {
       year: '',
@@ -132,8 +136,13 @@ class CountdownTimer extends Component {
   _drawBackground = () => {
     this._parsedFormatArr.map(format => {
       const propsName = '_' + format + 'CanvasContext';
+      const timeMeasure = this._timeMeasure[format];
+      const isRemainderZero = parseInt(this.state[format], 10) % timeMeasure === 0;
       this[propsName].beginPath();
       this[propsName].globalAlpha = 1 / 3;
+      isRemainderZero
+        ? this[propsName].fillStyle = this.props.colorFinished
+        : this[propsName].fillStyle = this.props.colorGoing;
       this[propsName].arc(this._radius, this._radius, this._radius, 0, Math.PI * 2, false);
       this[propsName].arc(this._radius, this._radius, this._radius / 1.3, Math.PI * 2, 0, true);
       this[propsName].fill();
@@ -143,7 +152,7 @@ class CountdownTimer extends Component {
   _clearTimer = () => {
     this._parsedFormatArr.map(format => {
       const propsName = '_' + format + 'CanvasContext';
-      this[propsName].clearRect(0, 0, 1240, 1240);
+      this[propsName].clearRect(0, 0, 2000, 2000);
     });
     this._drawBackground();
   }
@@ -151,13 +160,17 @@ class CountdownTimer extends Component {
   _drawTimer = () => {
     this._parsedFormatArr.map(format => {
       const timeMeasure = this._timeMeasure[format];
+      const isRemainderZero = parseInt(this.state[format], 10) % timeMeasure === 0;
       const percent = 2 * parseInt(this.state[format], 10) / timeMeasure - 4.5;
       const propsName = '_' + format + 'CanvasContext';
-      this[propsName].globalAlpha = 1 / 3;
-      this[propsName].fillStyle = 'grey';
+      this[propsName].globalAlpha = 2 / 3;
+      this[propsName].fillStyle = this.props.textColor;
       this[propsName].fillText(this.state[format], this._radius, this._radius - 15);
       this[propsName].fillText(format, this._radius, this._radius + 15);
       this[propsName].beginPath();
+      isRemainderZero
+        ? this[propsName].fillStyle = this.props.colorFinished
+        : this[propsName].fillStyle = this.props.colorGoing;
       this[propsName].arc(this._radius, this._radius, this._radius, Math.PI * 1.5, Math.PI * percent, false);
       this[propsName].arc(this._radius, this._radius, this._radius / 1.3, Math.PI * percent, Math.PI * 1.5, true);
       this[propsName].fill();
@@ -167,12 +180,13 @@ class CountdownTimer extends Component {
   render() {
     const format = (this._parseFormat(this._format));
     return (
-      <div className="root-container">
+      <div className={ styles.root_container }>
         <section
+          className={ styles.timer_container }
           id="countdown"
           ref="countdown">
             {format.day ? (
-            <div className="years-container">
+            <div className={styles.canvas_container}>
               <canvas
                 className="react-countdown-clock"
                 ref="year_canvas"
@@ -181,7 +195,7 @@ class CountdownTimer extends Component {
               </canvas>
             </div> ) : null}
             {format.day ? (
-            <div>
+            <div className={styles.canvas_container}>
               <canvas
                 className="react-countdown-clock"
                 ref="day_canvas"
@@ -190,7 +204,7 @@ class CountdownTimer extends Component {
               </canvas>
             </div> ) : null}
             {format.hour ? (
-            <div>
+            <div className={styles.canvas_container}>
               <canvas
                 className="react-countdown-clock"
                 ref="hour_canvas"
@@ -199,7 +213,7 @@ class CountdownTimer extends Component {
               </canvas>
             </div> ) : null}
             {format.minute ? (
-            <div>
+            <div className={styles.canvas_container}>
               <canvas
                 className="react-countdown-clock"
                 ref="minute_canvas"
@@ -208,7 +222,7 @@ class CountdownTimer extends Component {
               </canvas>
             </div> ) : null}
             {format.second ? (
-            <div>
+            <div className={styles.canvas_container}>
               <canvas
                 className="react-countdown-clock"
                 ref="second_canvas"
