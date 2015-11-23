@@ -71,7 +71,17 @@ class CountdownTimer extends Component {
 
   _updateClock() {
     const time = this._getTime(this.state.deadline);
+    /* loop through format to compute period */
+    const basePeriod = [365, 24, 60, 60, 1];
+    const yearInSeconds = 365 * 24 * 60 * 60 * 1;
+    const period = basePeriod.reduce((preValue, currentValue, index) => {
+      console.log(this._parsedFormatArr[index - 1]);
+      return (yearInSeconds /
+          preValue * (this._parsedFormatArr[index - 1] ? currentValue : 1)
+      );
+    });
 
+    console.log(period);
     if (time.total <= 0) {
       clearTimeout(timeinterval);
     }
@@ -87,6 +97,7 @@ class CountdownTimer extends Component {
     this._clearTimer();
     this._drawTimer();
 
+    // here!!
     const timeinterval = setTimeout(this._updateClock.bind(this), 1000);
   }
 
@@ -165,7 +176,9 @@ class CountdownTimer extends Component {
       const propsName = '_' + format + 'CanvasContext';
       this[propsName].globalAlpha = 2 / 3;
       this[propsName].fillStyle = this.props.textColor;
-      this[propsName].fillText(this.state[format], this._radius, this._radius - 15);
+      this[propsName].font = '32px Roboto';
+      this[propsName].fillText(this.state[format], this._radius, this._radius - 15, );
+      this[propsName].font = '24px Roboto';
       this[propsName].fillText(format, this._radius, this._radius + 15);
       this[propsName].beginPath();
       isRemainderZero

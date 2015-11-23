@@ -20,7 +20,7 @@ export default class App extends Component {
         <Hr />
         <CountdownTimer
           deadline={'Oct 29 2020 00:00:50 UTC+0800'}
-          options={{format: 'year-day-hour'}}
+          options={{format: 'year-day-hour-minute-second'}}
           size="180px"
           colorFinished={Colors.pmHazeGreen}
           colorGoing={Colors.pmHazeYellow}
