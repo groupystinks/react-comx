@@ -17,6 +17,7 @@ const Colors = {
   whiteSmoke: '#EDEDED',
   white: '#FFFFFF',
   black: '#000000',
+  greenyRed: '#ff8d2f',
 };
 
 export default Colors;

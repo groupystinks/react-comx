@@ -10,6 +10,7 @@ class CountdownTimer extends Component {
     deadline: PropTypes.string.isRequired,
     options: PropTypes.object.isRequired,
     size: PropTypes.string,
+    fontSize: PropTypes.number,
     colorFinished: PropTypes.string,
     colorGoing: PropTypes.string,
     textColor: PropTypes.string,
@@ -17,6 +18,7 @@ class CountdownTimer extends Component {
 
   constructor() {
     super();
+    this._yearInSeconds = 365 * 24 * 60 * 60;
     this._format;
     this._parsedFormatArr;
     this._radius;
@@ -47,44 +49,29 @@ class CountdownTimer extends Component {
     this._format = this.props.options.format;
     const parsedFormat = this._parseFormat(this._format);
     this._parsedFormatArr = Object.keys(parsedFormat).filter(key => parsedFormat[key]);
+    this.setState({deadline: this.props.deadline});
   }
 
   componentDidMount() {
     this._setupCanvas();
     this._drawBackground();
-    this.initializeClock(this.props.deadline, this.props.options);
-    this.setState({deadline: this.props.deadline});
+    this.initializeClock();
   }
 
-  initializeClock = (endtime, options) => {
-    const format = options.format.split('-').map((form) => {
-      return {[form]: form};
-    }).reduce((previousValue, currentValue) => {
-      return Object.assign(
-        {},
-        previousValue,
-        currentValue
-      );
-    });
-    this._updateClock(endtime, format);
-  }
-
-  _updateClock() {
+  initializeClock = () => {
     const time = this._getTime(this.state.deadline);
-    /* loop through format to compute period */
-    const basePeriod = [365, 24, 60, 60, 1];
-    const yearInSeconds = 365 * 24 * 60 * 60 * 1;
-    const period = basePeriod.reduce((preValue, currentValue, index) => {
-      console.log(this._parsedFormatArr[index - 1]);
-      return (yearInSeconds /
-          preValue * (this._parsedFormatArr[index - 1] ? currentValue : 1)
-      );
-    });
 
-    console.log(period);
-    if (time.total <= 0) {
-      clearTimeout(timeinterval);
-    }
+    this.setState({
+      year: time.years,
+      day: time.days,
+      hour: ('0' + time.hours).slice(-2),
+      minute: ('0' + time.minutes).slice(-2),
+      second: ('0' + time.seconds).slice(-2),
+    }, this._updateClock);
+  }
+
+  _updateClock = () => {
+    const time = this._getTime(this.state.deadline);
 
     this.setState({
       year: time.years,
@@ -94,11 +81,18 @@ class CountdownTimer extends Component {
       second: ('0' + time.seconds).slice(-2),
     });
 
+    const periodsConvertUnit = [1, 365, 24, 60, 60];
+    const periodDenominator = periodsConvertUnit.reduce((preValue, currentValue, index) => {
+      return (preValue * (this._parsedFormatArr[index] ? currentValue : 1));
+    });
+    const period = this._yearInSeconds / periodDenominator;
     this._clearTimer();
     this._drawTimer();
 
-    // here!!
-    const timeinterval = setTimeout(this._updateClock.bind(this), 1000);
+    const timeinterval = setTimeout(this._updateClock.bind(this), 1000 * period);
+    if (time.total <= 0) {
+      clearTimeout(timeinterval);
+    }
   }
 
   _getTime(endtime) {
@@ -147,13 +141,9 @@ class CountdownTimer extends Component {
   _drawBackground = () => {
     this._parsedFormatArr.map(format => {
       const propsName = '_' + format + 'CanvasContext';
-      const timeMeasure = this._timeMeasure[format];
-      const isRemainderZero = parseInt(this.state[format], 10) % timeMeasure === 0;
       this[propsName].beginPath();
       this[propsName].globalAlpha = 1 / 3;
-      isRemainderZero
-        ? this[propsName].fillStyle = this.props.colorFinished
-        : this[propsName].fillStyle = this.props.colorGoing;
+      this[propsName].fillStyle = this.props.colorFinished;
       this[propsName].arc(this._radius, this._radius, this._radius, 0, Math.PI * 2, false);
       this[propsName].arc(this._radius, this._radius, this._radius / 1.3, Math.PI * 2, 0, true);
       this[propsName].fill();
@@ -171,19 +161,16 @@ class CountdownTimer extends Component {
   _drawTimer = () => {
     this._parsedFormatArr.map(format => {
       const timeMeasure = this._timeMeasure[format];
-      const isRemainderZero = parseInt(this.state[format], 10) % timeMeasure === 0;
       const percent = 2 * parseInt(this.state[format], 10) / timeMeasure - 4.5;
       const propsName = '_' + format + 'CanvasContext';
       this[propsName].globalAlpha = 2 / 3;
       this[propsName].fillStyle = this.props.textColor;
-      this[propsName].font = '32px Roboto';
+      this[propsName].font = this.props.fontSize + 'px ' + 'Roboto';
       this[propsName].fillText(this.state[format], this._radius, this._radius - 15, );
-      this[propsName].font = '24px Roboto';
+      this[propsName].font = this.props.fontSize * 3 / 4 + 'px ' + 'Roboto';
       this[propsName].fillText(format, this._radius, this._radius + 15);
+      this[propsName].fillStyle = this.props.colorGoing;
       this[propsName].beginPath();
-      isRemainderZero
-        ? this[propsName].fillStyle = this.props.colorFinished
-        : this[propsName].fillStyle = this.props.colorGoing;
       this[propsName].arc(this._radius, this._radius, this._radius, Math.PI * 1.5, Math.PI * percent, false);
       this[propsName].arc(this._radius, this._radius, this._radius / 1.3, Math.PI * percent, Math.PI * 1.5, true);
       this[propsName].fill();
