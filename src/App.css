@@ -18,6 +18,12 @@ body {
   margin: auto;
 }
 
+@media screen and (min-width: 1080px) {
+    .content_container {
+        width: 50%;
+    }
+}
+
 .hr_container{
   display: flex;
 }
@@ -26,6 +32,21 @@ body {
   display: flex;
   margin: auto;
   width: 80%;
+}
+
+@media screen and (max-width: 610px) {
+    .header_container {
+        flex-direction: column;
+    }
+    .content_container {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    .header_container {
+      margin: 0;
+      width: 100%;
+    }
 }
 
 .header {
