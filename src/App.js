@@ -14,13 +14,15 @@ export default class App extends Component {
     return (
       <section className="root">
         <div className={styles.content_container}>
-            <h3 className={styles.header}>Time Left to Haze-Free</h3>
-            <img className={styles.img} src={asean}/>
+            <div className={styles.header_container}>
+              <h3 className={styles.header}>Time Left <span className={styles.header_sm}>to Haze-Free</span></h3>
+              <img className={styles.img} src={asean}/>
+            </div>
         </div>
         <Hr />
         <CountdownTimer
           deadline={'Oct 29 2020 00:00:50 UTC+0800'}
-          options={{format: 'year-day-hour-minute'}}
+          options={{format: 'year-day-hour'}}
           size="180px"
           fontSize={32}
           colorFinished={Colors.white}
